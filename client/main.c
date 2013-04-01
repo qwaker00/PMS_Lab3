@@ -39,7 +39,7 @@ int client_connect(const char * hostname, int port)
 void client_getfile(int sock, const char* file, const char* hostname) {
     int n;
     char buf[1024];
-    int writen = snprintf(buf, sizeof(buf) - 1, "GET /%s HTTP/1.1\r\nHost: %s\r\n", file, hostname);
+    int writen = snprintf(buf, sizeof(buf) - 1, "GET /%s HTTP/1.1\r\nHost: %s\r\n\r\n", file, hostname);
     write(sock, buf, writen);
 
     while ( (n = read(sock, buf, sizeof(buf) - 1) ) > 0 )
