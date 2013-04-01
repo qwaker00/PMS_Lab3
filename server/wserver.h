@@ -13,7 +13,7 @@
     Simple WebServer
 */
 
-typedef void (*client_handler)(int socket);
+typedef void* (*client_handler)(void* socket);
 
 typedef struct _wserver {
     struct sockaddr_in serv_addr;

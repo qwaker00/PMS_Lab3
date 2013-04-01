@@ -1,4 +1,4 @@
-#include "server.h"
+#include "wserver.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -11,12 +11,14 @@ void write_bad_request(int sock) {
     write(sock, bad_response_msg, strlen(bad_response_msg));
 }
 
-void http_handler(int connfd)
+void* http_handler(void* sock)
 {
+    int connfd = *(int*)sock;
     int n, sent;
     char buf[1024];
     char path[1024];
 
+    free(sock);
     read(connfd, buf, sizeof(buf) - 1);
     if (strncmp(buf, "GET ", 4) == 0) {
         *strchr(buf + 4, ' ') = 0;
@@ -26,6 +28,9 @@ void http_handler(int connfd)
 
         FILE* data = fopen(path, "rb");
         if (data == NULL) {
+#ifdef _DEBUG
+            printf("No such file\n");
+#endif
             write_bad_request(connfd);
         } else {
             sent = 0;
@@ -36,14 +41,26 @@ void http_handler(int connfd)
             }
             fclose(data);
 
-            if (sent == 0)
+            if (sent == 0) {
+#ifdef _DEBUG
+                fprintf(stderr, "No data\n");
+#endif
                 write_bad_request(connfd);
+            } else {
+#ifdef _DEBUG
+                fprintf(stderr, "Sent %d bytes\n", sent);
+#endif
+            }
         }
     } else {
+#ifdef _DEBUG
+        fprintf(stderr, "Bad request\n");
+#endif
         write_bad_request(connfd);
     }
 
     close(connfd);
+    return 0;
 }
 
 
@@ -51,7 +68,7 @@ int main()
 {
     wserver s;
 
-    wserver_init(&s, 81, &http_handler);
+    wserver_init(&s, 82, &http_handler);
     wserver_listen(&s);
     wserver_finalize(&s);
 

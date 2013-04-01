@@ -1,5 +1,6 @@
-#include "server.h"
+#include "wserver.h"
 #include <stdio.h>
+#include <pthread.h>
 
 #define TRUE 1
 #define FALSE 0
@@ -33,13 +34,32 @@ void wserver_stop(wserver* self)
 
 void wserver_listen(wserver* self)
 {
+    int* param;
     int connfd;
+    socklen_t client_len;
+    struct sockaddr_in client_addr;
+    pthread_attr_t attr;
+    pthread_t tid;
+
     listen(self->listenfd, 100);
     self->running = TRUE;
     while (self->running)
-    {
-        connfd = accept(self->listenfd, (struct sockaddr*)NULL, NULL);
-        self->handler(connfd);
+    {        
+        client_len = sizeof(client_addr);
+        connfd = accept(self->listenfd, (struct sockaddr *)&client_addr, &client_len);
+
+#ifdef _DEBUG
+        fprintf(stderr, "Client %s:%d connected\n", inet_ntoa(client_addr.sin_addr), client_addr.sin_port);
+#endif
+        pthread_attr_init(&attr);
+        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+
+        param = malloc(sizeof(int));
+        *param = connfd;
+        if (pthread_create(&tid, &attr, self->handler, param)) {
+            handle_error("Create thread failed");
+        }
+
         sleep(1);
     }
 }
