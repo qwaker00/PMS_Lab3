@@ -2,6 +2,7 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <signal.h>
 
 const char data_path[] = "data";
 
@@ -64,11 +65,14 @@ void* http_handler(void* sock)
 }
 
 
-int main()
+int main(int argc, char* argv[])
 {
     wserver s;
+    int port = (argc > 1) ? atoi(argv[1]) : 80;
 
-    wserver_init(&s, 82, &http_handler);
+    signal(SIGCHLD, SIG_IGN);
+
+    wserver_init(&s, port, &http_handler);
     wserver_listen(&s);
     wserver_finalize(&s);
 

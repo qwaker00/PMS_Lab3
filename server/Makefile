@@ -1,6 +1,6 @@
 
 CC=$(CROSS_COMPILE)gcc 
-CFLAGS=-c -Wall
+CFLAGS=-c -Wall -x c
 LDFLAGS=-pthread
 
 SOURCES=main.c wserver.c
