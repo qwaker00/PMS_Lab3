@@ -3,7 +3,7 @@ CC=$(CROSS_COMPILE)gcc
 CFLAGS=-c -Wall -x c
 LDFLAGS=-pthread
 
-SOURCES=main.c wserver.c
+SOURCES=main.c wserver.c http.c
 OBJECTS=$(SOURCES:.c=.o)
 TARGET=server
 
