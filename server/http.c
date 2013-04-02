@@ -10,7 +10,8 @@
 
 static const char data_path[] = "data";
  
-void write_bad_request(int sock) {
+void write_bad_request(int sock)
+{
     static const char bad_response_msg[] =
         "HTTP/1.1 400 Bad Request\r\nContent-Type: text/html; charset=UTF-8\r\nConnection: close\r\n\r\n<h2>Bad Request</h2>\r\n";
     write(sock, bad_response_msg, strlen(bad_response_msg));
